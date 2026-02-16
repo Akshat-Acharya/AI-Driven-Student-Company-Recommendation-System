@@ -32,6 +32,7 @@ export interface CompanyJob {
   aiRecommended: number;
   status: "active" | "paused" | "closed";
   posted: string;
+  skills: string[];
 }
 
 export const studentProfile = {
@@ -117,6 +118,7 @@ export const companyJobs: CompanyJob[] = [
     aiRecommended: 18,
     status: "active",
     posted: "Jan 15, 2026",
+    skills: ["Python", "PyTorch", "MLOps", "Distributed Systems"],
   },
   {
     id: "2",
@@ -126,6 +128,7 @@ export const companyJobs: CompanyJob[] = [
     aiRecommended: 12,
     status: "active",
     posted: "Jan 20, 2026",
+    skills: ["React", "TypeScript", "Node.js", "PostgreSQL"],
   },
   {
     id: "3",
@@ -135,6 +138,7 @@ export const companyJobs: CompanyJob[] = [
     aiRecommended: 9,
     status: "paused",
     posted: "Feb 1, 2026",
+    skills: ["SQL", "Python", "Tableau", "Statistics"],
   },
 ];
 

@@ -35,13 +35,13 @@ export function CtaSection() {
               size="lg"
               className="rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90"
             >
-              <Link href="/student">
+              <Link href="/student/dashboard">
                 Get Started Free
                 <ArrowRight className="ml-1.5 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="rounded-full">
-              <Link href="/company">Book a Demo</Link>
+              <Link href="/company/dashboard">Book a Demo</Link>
             </Button>
           </div>
         </div>

@@ -1,5 +1,7 @@
 import { Navbar } from "@/components/navbar";
+import { ResumeUpload } from "@/components/student/resume-upload";
 import { ProfileCard } from "@/components/student/profile-card";
+import { SkillGapCard } from "@/components/student/skill-gap-card";
 import { JobCards } from "@/components/student/job-cards";
 import { AiChatPanel } from "@/components/student/ai-chat-panel";
 
@@ -23,14 +25,19 @@ export default function StudentDashboard() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[280px_1fr_320px]">
-          <aside className="lg:sticky lg:top-24 lg:self-start">
+          {/* Left column: Profile + Resume + Skill Gap */}
+          <aside className="flex flex-col gap-6 lg:sticky lg:top-24 lg:self-start">
             <ProfileCard />
+            <ResumeUpload />
+            <SkillGapCard />
           </aside>
 
+          {/* Center: Job Cards */}
           <section>
             <JobCards />
           </section>
 
+          {/* Right column: AI Chat */}
           <aside className="lg:sticky lg:top-24 lg:self-start">
             <AiChatPanel />
           </aside>

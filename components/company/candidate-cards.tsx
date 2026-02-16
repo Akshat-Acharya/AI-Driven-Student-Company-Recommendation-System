@@ -20,7 +20,13 @@ import {
 
 type Tab = "applied" | "recommended";
 
-function CandidateCard({ candidate }: { candidate: Candidate }) {
+function CandidateCard({
+  candidate,
+  rank,
+}: {
+  candidate: Candidate;
+  rank: number;
+}) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -29,7 +35,17 @@ function CandidateCard({ candidate }: { candidate: Candidate }) {
       className="glass rounded-xl p-5 transition-shadow hover:glow-primary"
     >
       <div className="flex items-start gap-4">
-        <MatchScoreBadge score={candidate.matchScore} size="sm" />
+        <div className="relative">
+          <MatchScoreBadge score={candidate.matchScore} size="sm" />
+          <motion.span
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.2 }}
+            className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-[10px] font-bold text-primary-foreground"
+          >
+            #{rank}
+          </motion.span>
+        </div>
 
         <div className="flex-1">
           <div className="flex items-start justify-between gap-2">
@@ -100,7 +116,7 @@ function CandidateCard({ candidate }: { candidate: Candidate }) {
               size="sm"
               className="rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90"
             >
-              Schedule Interview
+              {candidate.appliedDate ? "Schedule Interview" : "Invite to Apply"}
             </Button>
             <Button size="sm" variant="outline" className="rounded-full">
               View Profile
@@ -187,7 +203,7 @@ export function CandidateCards() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1, duration: 0.4 }}
             >
-              <CandidateCard candidate={candidate} />
+              <CandidateCard candidate={candidate} rank={i + 1} />
             </motion.div>
           ))}
         </motion.div>
