@@ -88,6 +88,17 @@ export function JobsOverview() {
                 <p className="text-xs text-muted-foreground">
                   {job.department} &middot; Posted {job.posted}
                 </p>
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {job.skills.map((skill) => (
+                    <Badge
+                      key={skill}
+                      variant="secondary"
+                      className="rounded-full text-xs"
+                    >
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
               </div>
 
               <div className="flex items-center gap-4 text-sm">

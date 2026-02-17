@@ -9,8 +9,8 @@ import { cn } from "@/lib/utils";
 
 const navLinks = [
   { href: "/", label: "Home", icon: Sparkles },
-  { href: "/student", label: "Student", icon: GraduationCap },
-  { href: "/company", label: "Company", icon: Briefcase },
+  { href: "/student/dashboard", label: "Student", icon: GraduationCap },
+  { href: "/company/dashboard", label: "Company", icon: Briefcase },
 ];
 
 export function Navbar() {

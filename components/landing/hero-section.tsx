@@ -68,8 +68,8 @@ export function HeroSection() {
             size="lg"
             className="rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90"
           >
-            <Link href="/student">
-              I'm a Student
+            <Link href="/student/dashboard">
+              I{"'"}m a Student
               <ArrowRight className="ml-1.5 h-4 w-4" />
             </Link>
           </Button>
@@ -79,7 +79,7 @@ export function HeroSection() {
             size="lg"
             className="rounded-full"
           >
-            <Link href="/company">I'm Hiring</Link>
+            <Link href="/company/dashboard">I{"'"}m Hiring</Link>
           </Button>
         </motion.div>
 
