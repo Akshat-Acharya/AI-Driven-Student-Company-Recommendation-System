@@ -10,3 +10,5 @@ node_modules/
 .DS_Store
 .env
 /lib/generated/prisma
+
+/lib/generated/prisma
