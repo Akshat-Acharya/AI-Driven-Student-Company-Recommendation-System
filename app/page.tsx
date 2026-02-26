@@ -9,6 +9,7 @@ export default function LandingPage() {
     <div className="min-h-screen">
       <Navbar />
       <main>
+        {/*trial comment and all */}
         <HeroSection />
         <FeaturesSection />
         <CtaSection />
