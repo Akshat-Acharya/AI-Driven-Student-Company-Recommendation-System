@@ -9,26 +9,27 @@ export default function PostAuthPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "loading") return;
+  if (status === "loading") return;
 
-    if (!session?.user) {
-      router.replace("/login");
-      return;
-    }
+  if (!session?.user) {
+    router.replace("/login");
+    return;
+  }
 
-    // If role not set → onboarding
-    if (!session.user.role) {
-      router.replace("/complete-profile");
-      return;
-    }
+  if (!session.user.role) {
+    router.replace("/onboarding");
+    return;
+  }
 
-    // Redirect based on role
-    if (session.user.role === "STUDENT") {
-      router.replace("/student/dashboard");
-    } else if (session.user.role === "COMPANY") {
-      router.replace("/company/dashboard");
-    }
-  }, [session, status, router]);
+  if (session.user.role === "STUDENT") {
+    router.replace("/student/dashboard");
+  }
+
+  if (session.user.role === "COMPANY") {
+    router.replace("/company/dashboard");
+  }
+
+}, [session, status]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">

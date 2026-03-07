@@ -1,15 +1,15 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
 
   session: {
-    strategy: "jwt" as const,
+    strategy: "jwt",
   },
 
   providers: [
@@ -20,14 +20,14 @@ export const authOptions = {
 
     CredentialsProvider({
       name: "Credentials",
+
       credentials: {
-        email: {},
-        password: {},
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
+
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
@@ -35,42 +35,50 @@ export const authOptions = {
 
         if (!user || !user.password) return null;
 
-        const isValid = await bcrypt.compare(
+        const valid = await bcrypt.compare(
           credentials.password,
           user.password
         );
 
-        if (!isValid) return null;
+        if (!valid) return null;
 
         return {
           id: user.id,
-          email: user.email,
-          role: user.role || undefined,
+          email: user.email!,
+          name: user.name,
+          role: user.role ?? null,
         };
       },
     }),
   ],
 
   callbacks: {
-    async jwt({ token, user }: { token: any; user?: any }) {
-      if (user) {
-        token.role = user.role;
-      }
+   async jwt({ token, user }) {
+  // First login
+  if (user) {
+    token.role = user.role ?? null;
+  }
 
-      if (!token.role && token.email) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: token.email },
-        });
-        token.role = dbUser?.role;
-      }
+  // Always sync role from DB
+  if (token.email) {
+    const dbUser = await prisma.user.findUnique({
+      where: { email: token.email },
+    });
 
-      return token;
-    },
+    token.role = dbUser?.role ?? null;
+  }
 
-    async session({ session, token } : {session : any; token : any}) {
+  return token;
+},
+
+    async session({ session, token }) {
       if (session.user) {
-        session.user.role = token.role;
+        session.user.role = token.role as
+          | "STUDENT"
+          | "COMPANY"
+          | null;
       }
+
       return session;
     },
   },

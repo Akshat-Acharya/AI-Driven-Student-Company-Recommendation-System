@@ -12,7 +12,7 @@ export function ThemeToggle() {
   return (
     <div className="flex items-center gap-3">
       {/* Login */}
-      <Link href="/login">
+      {/* <Link href="/login">
         <Button
           variant="ghost"
           size="sm"
@@ -36,7 +36,7 @@ export function ThemeToggle() {
         >
           Login
         </Button>
-      </Link>
+      </Link> */}
 
       {/* Signup */}
       {/* <Link href="/signup">
