@@ -6,16 +6,46 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { Navbar } from "@/components/navbar";
-import { RoleModal } from "@/components/role-modal";
 import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const [open, setOpen] = useState(false);
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const res = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+
+    setLoading(false);
+
+    if (res?.error) {
+      setError("Invalid email or password");
+      return;
+    }
+
+    router.push("/post-auth");
+  };
+
   return (
     <div>
       <Navbar />
+
       <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
-        {/* Background Gradient Glow */}
+        {/* Background Glow */}
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 blur-3xl" />
 
         <motion.div
@@ -23,16 +53,16 @@ export default function LoginPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="
-          w-full 
-          max-w-md 
-          rounded-2xl 
-          border 
-          border-border/40 
-          bg-background/60 
-          p-8 
-          shadow-xl 
-          backdrop-blur-xl
-        "
+            w-full 
+            max-w-md 
+            rounded-2xl 
+            border 
+            border-border/40 
+            bg-background/60 
+            p-8 
+            shadow-xl 
+            backdrop-blur-xl
+          "
         >
           {/* Heading */}
           <div className="mb-6 text-center">
@@ -43,36 +73,42 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form className="space-y-4">
-            <div className="space-y-2">
-              <Input
-                type="email"
-                placeholder="Email address"
-                className="rounded-xl bg-background/70"
-              />
-            </div>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <Input
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="rounded-xl bg-background/70"
+            />
 
-            <div className="space-y-2">
-              <Input
-                type="password"
-                placeholder="Password"
-                className="rounded-xl bg-background/70"
-              />
-            </div>
+            <Input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="rounded-xl bg-background/70"
+            />
 
             <Button
+              type="submit"
+              disabled={loading}
               className="
-              w-full 
-              rounded-xl 
-              bg-primary 
-              text-primary-foreground 
-              transition-all 
-              hover:opacity-90 
-              active:scale-[0.98]
-            "
+                w-full 
+                rounded-xl 
+                bg-primary 
+                text-primary-foreground 
+                transition-all 
+                hover:opacity-90 
+                active:scale-[0.98]
+              "
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </Button>
+
+            {error && <p className="text-sm text-red-500">{error}</p>}
           </form>
 
           {/* Divider */}
@@ -86,17 +122,19 @@ export default function LoginPage() {
 
           {/* Google Login */}
           <Button
+            type="button"
             variant="outline"
+            onClick={() => signIn("google", { callbackUrl: "/post-auth" })}
             className="
-            w-full 
-            rounded-xl 
-            border-border/40 
-            bg-background/40 
-            backdrop-blur-md
-            transition-all 
-            hover:bg-background/70
-            active:scale-[0.98]
-          "
+              w-full 
+              rounded-xl 
+              border-border/40 
+              bg-background/40 
+              backdrop-blur-md
+              transition-all 
+              hover:bg-background/70
+              active:scale-[0.98]
+            "
           >
             <FcGoogle className="mr-2 h-5 w-5" />
             Continue with Google
@@ -105,31 +143,29 @@ export default function LoginPage() {
           {/* Signup Link */}
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Don’t have an account?{" "}
-            <button
-              type="button"
-              onClick={() => setOpen(true)}
+            <Link
+              href="/signup"
               className="
-                        relative
-                        font-semibold
-                        text-primary
-                        transition-all
-                        duration-300
-                        hover:text-primary/80
-                        after:absolute
-                        after:-bottom-0.5
-                        after:left-0
-                        after:h-[2px]
-                        after:w-0
-                        after:bg-primary
-                        after:transition-all
-                        after:duration-300
-                        hover:after:w-full
-                        "
+                relative
+                font-semibold
+                text-primary
+                transition-all
+                duration-300
+                hover:text-primary/80
+                after:absolute
+                after:-bottom-0.5
+                after:left-0
+                after:h-[2px]
+                after:w-0
+                after:bg-primary
+                after:transition-all
+                after:duration-300
+                hover:after:w-full
+              "
             >
               Sign up
-            </button>
+            </Link>
           </p>
-          <RoleModal open={open} onOpenChange={setOpen} />
         </motion.div>
       </div>
     </div>
