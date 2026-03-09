@@ -13,26 +13,22 @@ import { useRouter } from "next/navigation";
 export default function LoginPage() {
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email,setEmail]=useState("");
+  const [password,setPassword]=useState("");
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState("");
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin=async(e:React.FormEvent)=>{
     e.preventDefault();
+
     setError("");
     setLoading(true);
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    const res=await signIn("credentials",{email,password,redirect:false});
 
     setLoading(false);
 
-    if (res?.error) {
+    if(res?.error){
       setError("Invalid email or password");
       return;
     }
@@ -41,133 +37,127 @@ export default function LoginPage() {
   };
 
   return (
-    <div>
-      <Navbar />
+    <div className="min-h-screen bg-[#09090b] text-white">
 
-      <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
-        {/* Background Glow */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 blur-3xl" />
+      <Navbar/>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="
-            w-full 
-            max-w-md 
-            rounded-2xl 
-            border 
-            border-border/40 
-            bg-background/60 
-            p-8 
-            shadow-xl 
-            backdrop-blur-xl
-          "
-        >
-          {/* Heading */}
-          <div className="mb-6 text-center">
-            <h1 className="text-2xl font-bold tracking-tight">Welcome Back</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Login to continue to TalentBridge
+      <div className="grid lg:grid-cols-2 min-h-screen pt-32">
+
+        {/* LEFT SIDE */}
+
+        <div className="hidden lg:flex flex-col justify-center px-20">
+
+          <motion.div
+          initial={{opacity:0,y:30}}
+          animate={{opacity:1,y:0}}
+          transition={{duration:0.6}}
+          >
+
+            <p className="text-indigo-400 text-sm mb-4">
+              AI Recruitment Platform
             </p>
-          </div>
 
-          {/* Form */}
-          <form onSubmit={handleLogin} className="space-y-4">
-            <Input
+            <h1 className="text-5xl font-bold leading-tight mb-6">
+              Match talent with
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">
+                mathematical precision.
+              </span>
+            </h1>
+
+            <p className="text-zinc-400 max-w-md text-lg">
+              Upload resumes, extract skills using AI, and rank candidates
+              automatically against job requirements.
+            </p>
+
+          </motion.div>
+
+        </div>
+
+        {/* RIGHT SIDE LOGIN */}
+
+        <div className="flex items-center justify-center px-6">
+
+          <motion.div
+          initial={{opacity:0,y:20}}
+          animate={{opacity:1,y:0}}
+          transition={{duration:0.5}}
+          className="w-full max-w-md"
+          >
+
+            <h2 className="text-3xl font-semibold mb-2">
+              Welcome back
+            </h2>
+
+            <p className="text-zinc-400 mb-8">
+              Sign in to your account
+            </p>
+
+            <form onSubmit={handleLogin} className="space-y-5">
+
+              <Input
               type="email"
               placeholder="Email address"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e)=>setEmail(e.target.value)}
               required
-              className="rounded-xl bg-background/70"
-            />
+              className="h-11 rounded-lg bg-[#0f0f12] border-white/10"
+              />
 
-            <Input
+              <Input
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e)=>setPassword(e.target.value)}
               required
-              className="rounded-xl bg-background/70"
-            />
+              className="h-11 rounded-lg bg-[#0f0f12] border-white/10"
+              />
 
-            <Button
+              <Button
               type="submit"
               disabled={loading}
-              className="
-                w-full 
-                rounded-xl 
-                bg-primary 
-                text-primary-foreground 
-                transition-all 
-                hover:opacity-90 
-                active:scale-[0.98]
-              "
+              className="w-full h-11 rounded-lg bg-gradient-to-r from-indigo-500 to-cyan-500"
+              >
+                {loading ? "Signing in..." : "Sign in"}
+              </Button>
+
+              {error && (
+                <p className="text-red-400 text-sm">{error}</p>
+              )}
+
+            </form>
+
+            {/* divider */}
+
+            <div className="my-6 flex items-center gap-4">
+              <div className="h-px flex-1 bg-white/10"/>
+              <span className="text-xs text-zinc-500">
+                OR
+              </span>
+              <div className="h-px flex-1 bg-white/10"/>
+            </div>
+
+            <Button
+            variant="outline"
+            onClick={()=>signIn("google",{callbackUrl:"/post-auth"})}
+            className="w-full h-11 rounded-lg border-white/10 bg-[#0f0f12]"
             >
-              {loading ? "Logging in..." : "Login"}
+              <FcGoogle className="mr-2"/>
+              Continue with Google
             </Button>
 
-            {error && <p className="text-sm text-red-500">{error}</p>}
-          </form>
+            <p className="mt-6 text-sm text-zinc-400">
+              Don't have an account?{" "}
+              <Link href="/signup" className="text-indigo-400">
+                Sign up
+              </Link>
+            </p>
 
-          {/* Divider */}
-          <div className="my-6 flex items-center gap-4">
-            <div className="h-px flex-1 bg-border" />
-            <span className="text-xs text-muted-foreground">
-              OR CONTINUE WITH
-            </span>
-            <div className="h-px flex-1 bg-border" />
-          </div>
+          </motion.div>
 
-          {/* Google Login */}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => signIn("google", { callbackUrl: "/post-auth" })}
-            className="
-              w-full 
-              rounded-xl 
-              border-border/40 
-              bg-background/40 
-              backdrop-blur-md
-              transition-all 
-              hover:bg-background/70
-              active:scale-[0.98]
-            "
-          >
-            <FcGoogle className="mr-2 h-5 w-5" />
-            Continue with Google
-          </Button>
+        </div>
 
-          {/* Signup Link */}
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            Don’t have an account?{" "}
-            <Link
-              href="/signup"
-              className="
-                relative
-                font-semibold
-                text-primary
-                transition-all
-                duration-300
-                hover:text-primary/80
-                after:absolute
-                after:-bottom-0.5
-                after:left-0
-                after:h-[2px]
-                after:w-0
-                after:bg-primary
-                after:transition-all
-                after:duration-300
-                hover:after:w-full
-              "
-            >
-              Sign up
-            </Link>
-          </p>
-        </motion.div>
       </div>
+
     </div>
   );
 }
