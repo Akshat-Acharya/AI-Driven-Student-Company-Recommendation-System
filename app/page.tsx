@@ -182,7 +182,7 @@ export default function UltimateGSAPHome() {
 
       gsap.utils.toArray(".bento-item").forEach((card: any) => {
         card.addEventListener("mousemove", (e: any) => {
-          const rect = card.getBoundingClientRect();
+          const rect = card.getBoundingClientRect(); 
 
           const x = e.clientX - rect.left;
           const y = e.clientY - rect.top;
