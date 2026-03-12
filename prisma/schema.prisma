@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../lib/generated/prisma"
@@ -26,19 +20,28 @@ enum ExperienceLevel {
   ADVANCED
 }
 
+enum ApplicationStatus {
+  APPLIED
+  SHORTLISTED
+  REJECTED
+  HIRED
+}
+
 model User {
-  id        String   @id @default(uuid())
-  email     String?   @unique
-   name          String?
-   emailVerified DateTime? // <-- REQUIRED
+  id            String   @id @default(uuid())
+  email         String?  @unique
+  name          String?
+  emailVerified DateTime?
   image         String?
-  password  String?
-  role      UserRole?
-  createdAt DateTime @default(now())
+  password      String?
+  role          UserRole?
+  createdAt     DateTime @default(now())
 
   studentProfile StudentProfile?
   companyProfile CompanyProfile?
-  chatMessages   ChatMessage[]
+
+  chatMessages ChatMessage[]
+
   accounts Account[]
   sessions Session[]
 }
@@ -49,18 +52,27 @@ model StudentProfile {
   user   User   @relation(fields: [userId], references: [id])
 
   fullName        String
+  university      String?
+  degree          String?
+  graduationYear  Int?
+
   cgpa            Float?
   experienceLevel ExperienceLevel?
   domainFocus     String?
 
-  resumeUrl String? // stored file path
-  skills    String[] // normalized skill list
-  projects  String[] // extracted project titles
+  resumeUrl String?
+
+  skills   String[]
+  projects String[]
+
+  profileCompleted Boolean @default(false)
 
   createdAt DateTime @default(now())
 
   applications Application[]
   matches      MatchScore[]
+
+  @@index([userId])
 }
 
 model CompanyProfile {
@@ -75,6 +87,8 @@ model CompanyProfile {
   createdAt DateTime @default(now())
 
   jobs Job[]
+
+  @@index([userId])
 }
 
 model Job {
@@ -84,8 +98,11 @@ model Job {
 
   title           String
   description     String?
+  domainFocus     String?
+
   requiredSkills  String[]
   preferredSkills String[]
+
   minCgpa         Float?
   experienceLevel ExperienceLevel?
 
@@ -93,6 +110,8 @@ model Job {
 
   applications Application[]
   matches      MatchScore[]
+
+  @@index([companyId])
 }
 
 model Application {
@@ -103,10 +122,13 @@ model Application {
   student StudentProfile @relation(fields: [studentId], references: [id])
   job     Job            @relation(fields: [jobId], references: [id])
 
-  status    String   @default("APPLIED") // APPLIED, SHORTLISTED, REJECTED
+  status ApplicationStatus @default(APPLIED)
+
   createdAt DateTime @default(now())
 
   @@unique([studentId, jobId])
+  @@index([studentId])
+  @@index([jobId])
 }
 
 model MatchScore {
@@ -119,10 +141,13 @@ model MatchScore {
   job     Job            @relation(fields: [jobId], references: [id])
 
   score       Float
-  explanation String? // AI-generated explanation
-  createdAt   DateTime @default(now())
+  explanation String?
+
+  createdAt DateTime @default(now())
 
   @@unique([studentId, jobId])
+  @@index([studentId])
+  @@index([jobId])
 }
 
 model ChatMessage {
@@ -131,25 +156,31 @@ model ChatMessage {
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  content   String
-  role      String
-  context   String?
+  content String
+  role    String
+  context String?
+
   createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Account {
-  id                 String  @id @default(uuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String? @db.Text
-  access_token       String? @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String? @db.Text
-  session_state      String?
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+
+  refresh_token String? @db.Text
+  access_token  String? @db.Text
+  expires_at    Int?
+
+  token_type String?
+  scope      String?
+  id_token   String? @db.Text
+
+  session_state String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -163,6 +194,8 @@ model Session {
   expires      DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
