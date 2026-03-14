@@ -22,7 +22,7 @@ export default function PostAuthPage() {
   }
 
   if (session.user.role === "STUDENT") {
-    router.replace("/student/dashboard");
+    router.replace("/student/onboarding");
   }
 
   if (session.user.role === "COMPANY") {

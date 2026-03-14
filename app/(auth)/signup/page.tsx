@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { Navbar } from "@/components/navbar";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -19,6 +21,24 @@ export default function SignupPage() {
   const [confirmPassword,setConfirmPassword]=useState("");
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
+  const { data: session, status } = useSession();
+
+    useEffect(() => {
+  if (status === "loading") return;
+
+  if (session?.user?.role === "STUDENT") {
+    router.replace("/student/dashboard");
+  }
+
+  if (session?.user?.role === "COMPANY") {
+    router.replace("/company/dashboard");
+  }
+
+  if (session && !session.user?.role) {
+    router.replace("/onboarding");
+  }
+}, [session, status, router]);
+
 
   const handleSignup=async(e:React.FormEvent)=>{
     e.preventDefault();

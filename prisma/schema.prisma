@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -42,7 +41,7 @@ model User {
 
   chatMessages ChatMessage[]
 
-  accounts Account[]
+  accounts Account[]  
   sessions Session[]
 }
 
