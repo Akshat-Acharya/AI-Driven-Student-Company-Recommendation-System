@@ -70,11 +70,6 @@ const companyLinks = [
     icon: LayoutDashboard,
   },
   {
-    href: "/company/post-job",
-    label: "Post Job",
-    icon: PlusCircle,
-  },
-  {
     href: "/company/jobs",
     label: "Jobs",
     icon: Briefcase,
