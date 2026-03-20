@@ -100,10 +100,11 @@ model Job {
   domainFocus     String?
 
   requiredSkills  String[]
-  preferredSkills String[]
+  // preferredSkills String[]
 
   minCgpa         Float?
   experienceLevel ExperienceLevel?
+  employmentType String? // "REMOTE" | "ONSITE" | "HYBRID"
 
   createdAt DateTime @default(now())
 

@@ -58,12 +58,20 @@ export async function POST(req: Request) {
     const job = await prisma.job.create({
       data: {
         companyId: user.companyProfile.id,
+
         title: body.title,
         description: body.description,
+
         experienceLevel: body.experienceLevel || null,
         minCgpa: body.minCgpa || null,
-        requiredSkills: [],
+        domainFocus: body.domainFocus || null,
+
+        // 🔥 IMPORTANT
+        requiredSkills: body.skills || [],
         preferredSkills: [],
+
+        // 🔥 NEW
+        employmentType: body.employmentType || null,
       },
     });
 
@@ -71,9 +79,10 @@ export async function POST(req: Request) {
 
   } catch (error) {
     console.error(error);
+
     return NextResponse.json(
       { error: "Failed to create job" },
       { status: 500 }
     );
   }
-}
+ }
