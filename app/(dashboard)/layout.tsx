@@ -3,6 +3,7 @@
 import { Navbar } from "@/components/navbar";
 import { Sidebar } from "@/components/sidebar";
 import { useSession } from "next-auth/react";
+import { Toaster } from "sonner";
 
 export default function DashboardLayout({
   children,
@@ -32,6 +33,16 @@ export default function DashboardLayout({
       "
     >
       {children}
+      <Toaster
+  position="top-right"
+  expand={true}
+  toastOptions={{
+    className : "glass-toast",
+    style: {
+      marginTop: "80px", // 🔥 push below navbar
+    },
+  }}
+/>
     </main>
 
   </div>

@@ -38,23 +38,18 @@ const studentLinks = [
   },
   {
     href: "/student/jobs",
-    label: "Recommended Jobs",
+    label: "Jobs",
     icon: Briefcase,
   },
   {
-    href: "/student/applications",
-    label: "Applications",
+    href: "/student/recommendations",
+    label: "AI Recommendations",
     icon: ClipboardList,
   },
   {
     href: "/student/skill-gap",
     label: "Skill Gap",
     icon: TrendingUp,
-  },
-  {
-    href: "/student/profile",
-    label: "Profile",
-    icon: User,
   },
   {
     href: "/student/assistant",

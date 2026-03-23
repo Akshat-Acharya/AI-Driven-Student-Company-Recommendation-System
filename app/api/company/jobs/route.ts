@@ -68,8 +68,6 @@ export async function POST(req: Request) {
 
         // 🔥 IMPORTANT
         requiredSkills: body.skills || [],
-        preferredSkills: [],
-
         // 🔥 NEW
         employmentType: body.employmentType || null,
       },
