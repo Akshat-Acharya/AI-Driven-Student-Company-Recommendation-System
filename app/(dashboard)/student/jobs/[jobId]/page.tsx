@@ -1,155 +1,228 @@
-"use client";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { MapPin } from "lucide-react";
+import StudentChat from "@/components/student/StudentChat";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { Briefcase, MapPin } from "lucide-react";
+export default async function JobDetailPage({
+  params,
+}: {
+  params: Promise<{ jobId: string }>;
+}) {
+  // ✅ unwrap params FIRST
+  const { jobId } = await params;
 
-export default function JobDetailPage() {
-  const params = useParams();
-  const jobId = params.jobId as string;
-
-  const [job, setJob] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-const [applied, setApplied] = useState(false);
-
-  useEffect(() => {
-    fetchJob();
-  }, []);
-
-  const fetchJob = async () => {
-    try {
-      const res = await fetch(`/api/student/jobs/${jobId}`);
-      const data = await res.json();
-      setJob(data.job);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const handleApply = async () => {
-  try {
-    setLoading(true);
-
-    const res = await fetch("/api/student/apply", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ jobId }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.error || "Failed to apply");
-      return;
-    }
-
-    setApplied(true);
-    alert("Application submitted");
-  } catch (err) {
-    console.error(err);
-    alert("Something went wrong");
-  } finally {
-    setLoading(false);
+  // ✅ now this works
+  if (!jobId) {
+    return <div className="text-white p-10">Invalid Job ID</div>;
   }
-};
+
+  // ✅ SESSION
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) {
+    return <div className="text-white p-10">Unauthorized</div>;
+  }
+
+  // ✅ USER + STUDENT PROFILE
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    include: {
+      studentProfile: true,
+    },
+  });
+
+  if (!user?.studentProfile) {
+    return <div className="text-white p-10">Profile not found</div>;
+  }
+
+  // ✅ JOB FETCH (MAIN FIX AREA)
+  const job = await prisma.job.findUnique({
+    where: { id: jobId },
+    include: {
+      company: true,
+      applications: {
+        where: {
+          studentId: user.studentProfile.id,
+        },
+        select: { id: true },
+      },
+    },
+  });
 
   if (!job) {
-    return <div className="text-white p-10">Loading...</div>;
+    return <div className="text-white p-10">Job not found</div>;
   }
 
-  return (
-    <div className="min-h-screen bg-[#09090b] text-white px-6 py-10">
+  const isApplied = job.applications.length > 0;
 
-      <div className="max-w-4xl mx-auto">
+ return (
+  <div className="min-h-screen bg-[#09090b] text-white px-6 py-10">
 
-        {/* HEADER */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">{job.title}</h1>
+    <div className="max-w-5xl mx-auto space-y-6">
 
-          <p className="text-indigo-400 mt-2 text-sm">
-            {job.company.companyName}
-          </p>
+      {/* HEADER CARD */}
+      <div className="
+        p-6 rounded-2xl
+        border border-white/10
+        bg-white/[0.03]
+      ">
+        <div className="flex justify-between items-start">
 
-          <div className="flex gap-4 text-xs text-zinc-500 mt-3">
-            <span className="flex items-center gap-1">
-              <MapPin size={12} /> {job.employmentType || "Remote"}
-            </span>
+          <div>
+            <h1 className="text-3xl font-bold">{job.title}</h1>
 
-            <span>
-              {new Date(job.createdAt).toDateString()}
-            </span>
+            <p className="text-indigo-400 mt-2 text-sm">
+              {job.company.companyName}
+            </p>
+
+            {/* META */}
+            <div className="flex gap-4 text-xs text-zinc-500 mt-3">
+              <span className="flex items-center gap-1">
+                <MapPin size={12} />
+                {job.employmentType || "Remote"}
+              </span>
+
+              <span>
+                {new Date(job.createdAt).toDateString()}
+              </span>
+            </div>
           </div>
+
+          {/* APPLIED BADGE */}
+          {isApplied && (
+            <span className="
+              text-xs px-3 py-1 rounded-full
+              bg-green-500/10 text-green-400
+              border border-green-400/20
+              h-fit
+            ">
+              Applied
+            </span>
+          )}
         </div>
+      </div>
 
-        {/* DESCRIPTION */}
-        <div className="p-6 rounded-2xl border border-white/10 bg-white/[0.03] mb-6">
-          <h2 className="text-sm text-zinc-400 mb-3">
-            Job Description
-          </h2>
+      {/* DESCRIPTION */}
+      <div className="
+        p-6 rounded-2xl
+        border border-white/10
+        bg-white/[0.03]
+      ">
+        <h2 className="text-sm text-zinc-400 mb-3">
+          Job Description
+        </h2>
 
-          <p className="text-sm text-zinc-300 whitespace-pre-line">
-            {job.description}
-          </p>
-        </div>
+        <p className="text-sm text-zinc-300 whitespace-pre-line leading-relaxed">
+          {job.description || "No description provided"}
+        </p>
+      </div>
 
-        {/* DOMAINS */}
+      {/* DETAILS GRID */}
+      <div className="grid md:grid-cols-2 gap-6">
+
+        {/* DOMAIN */}
         {job.domainFocus && (
-          <div className="p-6 rounded-2xl border border-white/10 bg-white/[0.03] mb-6">
+          <div className="
+            p-6 rounded-2xl
+            border border-white/10
+            bg-white/[0.03]
+          ">
             <h2 className="text-sm text-zinc-400 mb-3">
               Domain
             </h2>
 
-            <span className="px-3 py-1 rounded-lg text-xs bg-indigo-500/20 text-indigo-300">
+            <span className="
+              px-3 py-1 rounded-lg text-xs
+              bg-indigo-500/20 text-indigo-300
+            ">
               {job.domainFocus}
             </span>
           </div>
         )}
 
-        {/* SKILLS */}
-        {job.requiredSkills?.length > 0 && (
-          <div className="p-6 rounded-2xl border border-white/10 bg-white/[0.03] mb-6">
+        {/* CGPA + EXPERIENCE */}
+        {(job.minCgpa || job.experienceLevel) && (
+          <div className="
+            p-6 rounded-2xl
+            border border-white/10
+            bg-white/[0.03]
+          ">
             <h2 className="text-sm text-zinc-400 mb-3">
-              Required Skills
+              Requirements
             </h2>
 
-            <div className="flex flex-wrap gap-2">
-              {job.requiredSkills.map((skill: string) => (
-                <span
-                  key={skill}
-                  className="
-                    px-3 py-1 rounded-lg text-xs
-                    bg-white/[0.05] border border-white/10
-                  "
-                >
-                  {skill}
-                </span>
-              ))}
+            <div className="space-y-2 text-sm text-zinc-300">
+              {job.minCgpa && (
+                <p>Minimum CGPA: {job.minCgpa}</p>
+              )}
+              {job.experienceLevel && (
+                <p>Experience: {job.experienceLevel}</p>
+              )}
             </div>
           </div>
         )}
 
-        {/* APPLY BUTTON */}
-       <button
-  onClick={handleApply}
-  disabled={loading || applied}
-  className={`
-    w-full py-3 rounded-xl font-medium transition
-    ${
-      applied
-        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-400/20"
-        : "bg-gradient-to-r from-indigo-500 to-blue-500 text-white hover:opacity-90"
-    }
-  `}
->
-  {loading
-    ? "Applying..."
-    : applied
-    ? "Applied"
-    : "Apply Now"}
-</button>
-
       </div>
+
+      {/* SKILLS */}
+      {job.requiredSkills?.length > 0 && (
+        <div className="
+          p-6 rounded-2xl
+          border border-white/10
+          bg-white/[0.03]
+        ">
+          <h2 className="text-sm text-zinc-400 mb-3">
+            Required Skills
+          </h2>
+
+          <div className="flex flex-wrap gap-2">
+            {job.requiredSkills.map((skill: string) => (
+              <span
+                key={skill}
+                className="
+                  px-3 py-1 rounded-lg text-xs
+                  bg-white/[0.05]
+                  border border-white/10
+                  hover:bg-white/[0.08]
+                  transition
+                "
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* APPLY SECTION */}
+      <div className="
+        p-6 rounded-2xl
+        border border-white/10
+        bg-white/[0.03]
+      ">
+        <form action="/api/student/apply" method="POST">
+          <input type="hidden" name="jobId" value={job.id} />
+
+          <button
+            disabled={isApplied}
+            className={`
+              w-full py-3 rounded-xl font-medium transition
+              ${
+                isApplied
+                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-400/20 cursor-not-allowed"
+                  : "bg-gradient-to-r from-indigo-500 to-blue-500 text-white hover:opacity-90"
+              }
+            `}
+          >
+            {isApplied ? "Already Applied" : "Apply Now"}
+          </button>
+        </form>
+        
+      </div>
+           <StudentChat jobId={job.id} />   
     </div>
-  );
+    
+  </div>
+);
 }

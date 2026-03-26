@@ -46,16 +46,11 @@ const studentLinks = [
     label: "AI Recommendations",
     icon: ClipboardList,
   },
-  {
-    href: "/student/skill-gap",
-    label: "Skill Gap",
-    icon: TrendingUp,
-  },
-  {
-    href: "/student/assistant",
-    label: "AI Assistant",
-    icon: Bot,
-  },
+  // {
+  //   href: "/student/skill-gap",
+  //   label: "Skill Gap",
+  //   icon: TrendingUp,
+  // },
 ];
 
 const companyLinks = [
@@ -75,19 +70,9 @@ const companyLinks = [
     icon: Users,
   },
   {
-    href: "/company/matches",
-    label: "AI Matches",
-    icon: Sparkles,
-  },
-  {
     href: "/company/profile",
     label: "Company Profile",
     icon: Building,
-  },
-  {
-    href: "/company/assistant",
-    label: "AI Assistant",
-    icon: Bot,
   },
 ];
 

@@ -5,6 +5,7 @@ import { redirect, notFound } from "next/navigation";
 import { Briefcase, MapPin, GraduationCap, Sparkles } from "lucide-react";
 import ApplicantsSection from "@/components/company/ApplicantsSection";
 import JobActions from "@/components/company/JobActions";
+import CompanyChat from "@/components/company/CompanyChat";
 
 // Force the page to be dynamic so it doesn't show cached data from other users
 export const dynamic = "force-dynamic";
@@ -204,6 +205,7 @@ export default async function JobDetailPage({
           <ApplicantsSection jobId={job.id} />
         </div>
       </div>
+      <CompanyChat jobId={job.id} />
     </div>
   );
 }
