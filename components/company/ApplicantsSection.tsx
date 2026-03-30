@@ -4,9 +4,37 @@ import { useEffect, useState } from "react";
 import { Sparkles, RefreshCw, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 
+/* 🔥 MODAL */
+function CompareModal({ open, onClose, result }: any) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div className="bg-[#09090b] w-[600px] max-h-[80vh] overflow-y-auto p-6 rounded-xl border border-white/10">
+        <div className="flex justify-between mb-4">
+          <h2 className="text-lg font-semibold">
+            🔍 Candidate Comparison
+          </h2>
+          <button onClick={onClose}>✕</button>
+        </div>
+
+        <div className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
+          {result}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ApplicantsSection({ jobId }: { jobId: string }) {
   const [apps, setApps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  /* 🔥 COMPARE STATE */
+  const [selected, setSelected] = useState<string[]>([]);
+  const [compareResult, setCompareResult] = useState("");
+  const [openModal, setOpenModal] = useState(false);
+  const [comparing, setComparing] = useState(false);
 
   useEffect(() => {
     fetchApplicants();
@@ -14,15 +42,59 @@ export default function ApplicantsSection({ jobId }: { jobId: string }) {
 
   const fetchApplicants = async () => {
     try {
-      const res = await fetch(
-        `/api/company/jobs/${jobId}/applications`
-      );
+      const res = await fetch(`/api/company/jobs/${jobId}/applications`);
       const data = await res.json();
       setApps(data.applications || []);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  /* 🔥 SELECT TOGGLE */
+  const toggleSelect = (id: string) => {
+    if (selected.includes(id)) {
+      setSelected(selected.filter((x) => x !== id));
+    } else {
+      if (selected.length >= 2) {
+        alert("Only 2 candidates can be compared");
+        return;
+      }
+      setSelected([...selected, id]);
+    }
+  };
+
+  /* 🔥 COMPARE */
+  const handleCompare = async () => {
+    if (selected.length !== 2) {
+      alert("Select exactly 2 candidates");
+      return;
+    }
+
+    try {
+      setComparing(true);
+
+      const res = await fetch("/api/company/compare", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          candidateIds: selected,
+          jobId,
+        }),
+      });
+
+      const data = await res.json();
+
+      setCompareResult(data.result);
+      setOpenModal(true);
+    } catch (err) {
+      console.error(err);
+      alert("Error comparing");
+    } finally {
+      setComparing(false);
     }
   };
 
@@ -36,7 +108,6 @@ export default function ApplicantsSection({ jobId }: { jobId: string }) {
     fetchApplicants();
   };
 
-  /* 🔥 RE-EVALUATE */
   const reEvaluate = async (studentId: string) => {
     await fetch(`/api/company/re-evaluate`, {
       method: "POST",
@@ -56,14 +127,20 @@ export default function ApplicantsSection({ jobId }: { jobId: string }) {
 
   return (
     <div>
-      <div className="mb-8 flex justify-between">
+      {/* HEADER */}
+      <div className="mb-8 flex justify-between items-center">
         <h2 className="text-2xl font-semibold flex gap-2 items-center">
           <Sparkles size={18} className="text-indigo-400" />
           AI Ranked Applicants
         </h2>
-        <span className="text-sm text-zinc-500">
-          {apps.length} candidates
-        </span>
+
+        <button
+          onClick={handleCompare}
+          disabled={comparing}
+          className="px-4 py-2 bg-indigo-600 rounded text-sm"
+        >
+          {comparing ? "Comparing..." : "Compare"}
+        </button>
       </div>
 
       {loading && <p>Loading...</p>}
@@ -78,9 +155,18 @@ export default function ApplicantsSection({ jobId }: { jobId: string }) {
                 className="p-5 rounded-2xl border border-indigo-400/30 bg-indigo-500/5"
               >
                 <div className="flex justify-between mb-2">
-                  <h3 className="text-white font-semibold">
-                    #{i + 1} {app.student.fullName}
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    {/* 🔥 CHECKBOX */}
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(app.student.id)}
+                      onChange={() => toggleSelect(app.student.id)}
+                    />
+
+                    <h3 className="text-white font-semibold">
+                      #{i + 1} {app.student.fullName}
+                    </h3>
+                  </div>
 
                   <span className="text-xs bg-indigo-500/20 px-2 py-1 rounded">
                     {app.score}%
@@ -143,30 +229,21 @@ export default function ApplicantsSection({ jobId }: { jobId: string }) {
                   )}
                 </div>
 
-                {/* STATUS */}
                 <p className={`text-xs mt-2 ${getStatusColor(app.status)}`}>
                   {app.status}
                 </p>
               </motion.div>
             ))}
           </div>
-
-          {/* OTHERS */}
-          <div className="grid md:grid-cols-2 gap-4">
-            {others.map((app) => (
-              <div
-                key={app.id}
-                className="p-4 border border-white/10 rounded-xl"
-              >
-                <div className="flex justify-between">
-                  <span>{app.student.fullName}</span>
-                  <span className="text-xs">{app.score}%</span>
-                </div>
-              </div>
-            ))}
-          </div>
         </>
       )}
+
+      {/* 🔥 MODAL */}
+      <CompareModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        result={compareResult}
+      />
     </div>
   );
 }

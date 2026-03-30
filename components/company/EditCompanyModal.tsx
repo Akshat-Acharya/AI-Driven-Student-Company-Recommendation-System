@@ -112,53 +112,69 @@ export default function EditCompanyModal({
     <AnimatePresence>
       {open && (
         <>
+          {/* BACKDROP */}
           <motion.div
-            className="fixed inset-0 z-[9998] bg-black/70 backdrop-blur-md"
+            className="fixed inset-0 z-[9998] bg-black/70 backdrop-blur-xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setOpen(false)}
           />
 
+          {/* MODAL */}
           <motion.div
             className="fixed inset-0 z-[9999] flex items-center justify-center px-4"
-            initial={{ opacity: 0, scale: 0.96, y: 30 }}
+            initial={{ opacity: 0, scale: 0.96, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0 }}
           >
-            <div className="w-full max-w-3xl rounded-2xl border border-white/10 bg-[#0b0b0d] p-6">
+            <div className="
+              w-full max-w-3xl max-h-[90vh]
+              flex flex-col
+              rounded-3xl
+              border border-white/10
+              bg-gradient-to-br from-[#0b0b0d] to-[#111115]
+              shadow-[0_0_80px_rgba(99,102,241,0.25)]
+              overflow-hidden
+            ">
 
-              <button
-                onClick={() => setOpen(false)}
-                className="absolute top-5 right-5 text-zinc-500"
-              >
-                <X size={18} />
-              </button>
+              {/* HEADER */}
+              <div className="relative px-6 py-5 border-b border-white/10">
 
-              <h2 className="text-xl font-semibold mb-1">
-                Edit Company Profile
-              </h2>
-              <p className="text-sm text-zinc-500 mb-6">
-                This helps students understand your company better
-              </p>
+                <div className="absolute inset-0 bg-indigo-500/5 blur-2xl" />
 
-              <div className="space-y-6">
+                <div className="relative flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold">
+                      Edit Company Profile
+                    </h2>
+                    <p className="text-xs text-zinc-500 mt-1">
+                      Update how your company appears to students
+                    </p>
+                  </div>
 
-                {/* BASIC */}
+                  <button
+                    onClick={() => setOpen(false)}
+                    className="p-2 rounded-lg hover:bg-white/5 transition"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
+
+              {/* CONTENT */}
+              <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
+
                 <Section title="Basic Info">
                   <div className="grid md:grid-cols-2 gap-4">
                     <Input
                       label="Company Name"
-                      placeholder="e.g. Code Crafters Pvt Ltd"
                       value={form.companyName}
                       onChange={(e: any) =>
                         setForm({ ...form, companyName: e.target.value })
                       }
                     />
-
                     <Input
                       label="Location"
-                      placeholder="e.g. Bangalore, India"
                       value={form.location}
                       onChange={(e: any) =>
                         setForm({ ...form, location: e.target.value })
@@ -167,47 +183,39 @@ export default function EditCompanyModal({
                   </div>
                 </Section>
 
-                {/* DETAILS */}
                 <Section title="Company Details">
                   <div className="grid md:grid-cols-2 gap-4">
                     <Input
                       label="Website"
-                      placeholder="https://yourcompany.com"
                       value={form.website}
                       onChange={(e: any) =>
                         setForm({ ...form, website: e.target.value })
                       }
                     />
-
                     <Input
                       label="Industry"
-                      placeholder="e.g. AI / SaaS / FinTech"
                       value={form.industry}
                       onChange={(e: any) =>
                         setForm({ ...form, industry: e.target.value })
                       }
                     />
 
-                   <select
-  value={form.companySize}
-  onChange={(e) =>
-    setForm({ ...form, companySize: e.target.value })
-  }
-  className="
-    h-10 rounded-lg bg-white/[0.04]
-    border border-white/10 px-3 text-sm
-  "
->
-  <option value="">Select size</option>
-  <option value="SMALL">1-10</option>
-  <option value="MEDIUM">10-50</option>
-  <option value="LARGE">50-200</option>
-  <option value="ENTERPRISE">200+</option>
-</select>
+                    <Select
+                      label="Company Size"
+                      value={form.companySize}
+                      onChange={(e: any) =>
+                        setForm({ ...form, companySize: e.target.value })
+                      }
+                    >
+                      <option value="">Select size</option>
+                      <option value="SMALL">1-10</option>
+                      <option value="MEDIUM">10-50</option>
+                      <option value="LARGE">50-200</option>
+                      <option value="ENTERPRISE">200+</option>
+                    </Select>
 
                     <Input
                       label="Founded Year"
-                      placeholder="e.g. 2020"
                       type="number"
                       value={form.foundedYear}
                       onChange={(e: any) =>
@@ -217,47 +225,35 @@ export default function EditCompanyModal({
                   </div>
                 </Section>
 
-                {/* HIRING */}
                 <Section title="Hiring Domains">
                   <input
-                    placeholder="e.g. Web Dev, AI, Backend"
                     value={domainsInput}
                     onChange={(e) => setDomainsInput(e.target.value)}
-                    className="
-                      w-full h-10 rounded-lg
-                      bg-white/[0.04]
-                      border border-white/10
-                      px-3 text-sm outline-none
-                    "
+                    placeholder="Web Dev, AI, Backend..."
+                    className="w-full h-11 rounded-xl bg-white/[0.04] border border-white/10 px-4 text-sm outline-none focus:border-indigo-400"
                   />
-                  <p className="text-xs text-zinc-500 mt-1">
-                    Add roles you hire for (comma separated)
-                  </p>
                 </Section>
 
-                {/* LINKS */}
                 <Section title="Links">
                   <div className="space-y-3">
                     {form.socialLinks.map((link, index) => (
                       <div key={index} className="flex gap-2">
                         <input
-                          placeholder="e.g. LinkedIn"
                           value={link.label}
                           onChange={(e) =>
                             updateLink(index, "label", e.target.value)
                           }
-                          className="flex-1 h-10 rounded-lg bg-white/[0.04] border border-white/10 px-3 text-sm"
+                          placeholder="Label"
+                          className="flex-1 h-11 rounded-xl bg-white/[0.04] border border-white/10 px-4 text-sm"
                         />
-
                         <input
-                          placeholder="https://..."
                           value={link.url}
                           onChange={(e) =>
                             updateLink(index, "url", e.target.value)
                           }
-                          className="flex-1 h-10 rounded-lg bg-white/[0.04] border border-white/10 px-3 text-sm"
+                          placeholder="URL"
+                          className="flex-1 h-11 rounded-xl bg-white/[0.04] border border-white/10 px-4 text-sm"
                         />
-
                         <button
                           onClick={() => removeLink(index)}
                           className="px-3 text-red-400"
@@ -269,32 +265,30 @@ export default function EditCompanyModal({
 
                     <button
                       onClick={addLink}
-                      className="flex items-center gap-2 text-sm text-indigo-400"
+                      className="flex items-center gap-2 text-sm text-indigo-400 hover:text-indigo-300"
                     >
                       <Plus size={14} /> Add Link
                     </button>
                   </div>
                 </Section>
 
-                {/* DESCRIPTION */}
                 <Section title="About Company">
                   <textarea
-                    placeholder="Tell students what your company does and what you build..."
                     value={form.description}
                     onChange={(e) =>
                       setForm({ ...form, description: e.target.value })
                     }
-                    className="w-full h-28 rounded-xl bg-white/[0.04] border border-white/10 p-3 text-sm"
+                    className="w-full h-32 rounded-xl bg-white/[0.04] border border-white/10 p-4 text-sm"
                   />
                 </Section>
 
               </div>
 
-              {/* ACTIONS */}
-              <div className="flex gap-3 mt-6">
+              {/* FOOTER */}
+              <div className="p-5 border-t border-white/10 flex gap-3">
                 <button
                   onClick={() => setOpen(false)}
-                  className="flex-1 py-2 rounded-lg border border-white/10"
+                  className="flex-1 py-2.5 rounded-xl border border-white/10 hover:bg-white/5 transition"
                 >
                   Cancel
                 </button>
@@ -302,9 +296,9 @@ export default function EditCompanyModal({
                 <button
                   onClick={handleSave}
                   disabled={loading}
-                  className="flex-1 py-2 rounded-lg bg-indigo-500 text-white"
+                  className="flex-1 py-2.5 rounded-xl bg-indigo-500 text-white hover:bg-indigo-400 transition shadow-lg"
                 >
-                  {loading ? "Saving..." : "Save"}
+                  {loading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
 
@@ -317,11 +311,14 @@ export default function EditCompanyModal({
   );
 }
 
-/* UI */
+/* ---------------- UI ---------------- */
+
 function Section({ title, children }: any) {
   return (
     <div>
-      <h3 className="text-sm text-zinc-400 mb-3">{title}</h3>
+      <h3 className="text-xs uppercase tracking-wider text-zinc-500 mb-3">
+        {title}
+      </h3>
       {children}
     </div>
   );
@@ -333,8 +330,22 @@ function Input({ label, ...props }: any) {
       <label className="text-xs text-zinc-500">{label}</label>
       <input
         {...props}
-        className="h-10 rounded-lg bg-white/[0.04] border border-white/10 px-3 text-sm outline-none"
+        className="h-11 rounded-xl bg-white/[0.04] border border-white/10 px-4 text-sm outline-none focus:border-indigo-400"
       />
     </div>
   );
-}``
+}
+
+function Select({ label, children, ...props }: any) {
+  return (
+    <div className="flex flex-col gap-1">
+      <label className="text-xs text-zinc-500">{label}</label>
+      <select
+        {...props}
+        className="h-11 rounded-xl bg-white/[0.04] border border-white/10 px-4 text-sm outline-none focus:border-indigo-400"
+      >
+        {children}
+      </select>
+    </div>
+  );
+}

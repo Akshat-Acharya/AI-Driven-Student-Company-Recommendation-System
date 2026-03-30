@@ -65,11 +65,6 @@ const companyLinks = [
     icon: Briefcase,
   },
   {
-    href: "/company/candidates",
-    label: "Candidates",
-    icon: Users,
-  },
-  {
     href: "/company/profile",
     label: "Company Profile",
     icon: Building,

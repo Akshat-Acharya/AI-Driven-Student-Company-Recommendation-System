@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { MapPin } from "lucide-react";
 import StudentChat from "@/components/student/StudentChat";
+import ApplyButton from "@/components/student/ApplyButton";
 
 export default async function JobDetailPage({
   params,
@@ -201,23 +202,7 @@ export default async function JobDetailPage({
         border border-white/10
         bg-white/[0.03]
       ">
-        <form action="/api/student/apply" method="POST">
-          <input type="hidden" name="jobId" value={job.id} />
-
-          <button
-            disabled={isApplied}
-            className={`
-              w-full py-3 rounded-xl font-medium transition
-              ${
-                isApplied
-                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-400/20 cursor-not-allowed"
-                  : "bg-gradient-to-r from-indigo-500 to-blue-500 text-white hover:opacity-90"
-              }
-            `}
-          >
-            {isApplied ? "Already Applied" : "Apply Now"}
-          </button>
-        </form>
+        <ApplyButton jobId={job.id} isApplied={isApplied} />
         
       </div>
            <StudentChat jobId={job.id} />   

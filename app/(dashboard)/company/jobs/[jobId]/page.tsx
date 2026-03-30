@@ -6,14 +6,14 @@ import { Briefcase, MapPin, GraduationCap, Sparkles } from "lucide-react";
 import ApplicantsSection from "@/components/company/ApplicantsSection";
 import JobActions from "@/components/company/JobActions";
 import CompanyChat from "@/components/company/CompanyChat";
+import CompareCandidates from "@/components/company/CompareCandidates";
 
-// Force the page to be dynamic so it doesn't show cached data from other users
 export const dynamic = "force-dynamic";
 
 export default async function JobDetailPage({
   params,
 }: {
-  params: Promise<{ jobId: string }>; // In Next.js 15, params is a Promise
+  params: Promise<{ jobId: string }>;
 }) {
   const session = await getServerSession(authOptions);
 
@@ -21,26 +21,27 @@ export default async function JobDetailPage({
     redirect("/login");
   }
 
-  // 1. CRITICAL FIX: Await the params before using them
-  const decodedParams = await params;
-  const jobId = decodedParams.jobId;
+  const { jobId } = await params;
 
-  // 2. Fetch the specific job owned by this user
+  /* 🔥 IMPORTANT: INCLUDE APPLICATIONS + STUDENTS */
   const job = await prisma.job.findFirst({
     where: {
-      id: jobId, // This ensures we only get the job matching the URL
+      id: jobId,
       company: {
-        userId: session.user.id, // This ensures the logged-in user owns it
+        userId: session.user.id,
+      },
+    },
+    include: {
+      applications: {
+        include: {
+          student: true,
+        },
       },
     },
   });
 
-  // Debugging log to see exactly what is being pulled in your terminal
-  console.log(`Fetching Job ID: ${jobId} for User: ${session.user.id}`);
-  console.log("Result Found:", job?.title || "NULL");
-
   if (!job) {
-    notFound(); // Redirects to your 404 page if ID is wrong or belongs to another user
+    notFound();
   }
 
   const formatEmployment = (type?: string | null) => {
@@ -57,7 +58,7 @@ export default async function JobDetailPage({
       </div>
 
       <div className="relative max-w-6xl mx-auto">
-        {/* ================= HERO ================= */}
+        {/* HERO */}
         <div className="mb-14">
           <span
             className={`
@@ -71,6 +72,7 @@ export default async function JobDetailPage({
           >
             {job.status}
           </span>
+
           <h1 className="text-4xl md:text-5xl font-semibold tracking-tight leading-tight mb-4">
             {job.title}
           </h1>
@@ -100,9 +102,9 @@ export default async function JobDetailPage({
           </div>
         </div>
 
-        {/* ================= MAIN GRID ================= */}
+        {/* MAIN GRID */}
         <div className="grid md:grid-cols-3 gap-10">
-          {/* LEFT CONTENT */}
+          {/* LEFT */}
           <div className="md:col-span-2 space-y-10">
             {/* DESCRIPTION */}
             <div>
@@ -135,8 +137,6 @@ export default async function JobDetailPage({
                       bg-white/[0.04]
                       border border-white/10
                       text-zinc-300
-                      hover:border-indigo-400/40 hover:text-white
-                      transition-all
                     "
                   >
                     {skill}
@@ -148,36 +148,29 @@ export default async function JobDetailPage({
             {/* DOMAIN */}
             {job.domainFocus && (
               <div>
-                <h2 className="text-xl font-semibold mb-2">Domain Focus</h2>
-                <p className="text-zinc-400 text-sm">{job.domainFocus}</p>
+                <h2 className="text-xl font-semibold mb-2">
+                  Domain Focus
+                </h2>
+                <p className="text-zinc-400 text-sm">
+                  {job.domainFocus}
+                </p>
               </div>
             )}
           </div>
 
-          {/* RIGHT SIDE PANEL */}
+          {/* RIGHT */}
           <div className="space-y-6">
-            {/* ACTION CARD */}
-            <div
-              className="
-                p-6 rounded-2xl
-                border border-white/10
-                bg-white/[0.03]
-                backdrop-blur-xl
-              "
-            >
-              <h3 className="text-sm text-zinc-400 mb-4">Actions</h3>
+            <div className="p-6 rounded-2xl border border-white/10 bg-white/[0.03]">
+              <h3 className="text-sm text-zinc-400 mb-4">
+                Actions
+              </h3>
               <JobActions job={job} />
             </div>
 
-            {/* QUICK INFO */}
-            <div
-              className="
-                p-6 rounded-2xl
-                border border-white/10
-                bg-gradient-to-b from-white/[0.04] to-transparent
-              "
-            >
-              <h3 className="text-sm text-zinc-400 mb-4">Overview</h3>
+            <div className="p-6 rounded-2xl border border-white/10 bg-white/[0.03]">
+              <h3 className="text-sm text-zinc-400 mb-4">
+                Overview
+              </h3>
 
               <div className="space-y-3 text-sm">
                 <InfoRow label="Employment">
@@ -185,11 +178,15 @@ export default async function JobDetailPage({
                 </InfoRow>
 
                 {job.experienceLevel && (
-                  <InfoRow label="Experience">{job.experienceLevel}</InfoRow>
+                  <InfoRow label="Experience">
+                    {job.experienceLevel}
+                  </InfoRow>
                 )}
 
                 {job.minCgpa && (
-                  <InfoRow label="Minimum CGPA">{job.minCgpa}+</InfoRow>
+                  <InfoRow label="Minimum CGPA">
+                    {job.minCgpa}+
+                  </InfoRow>
                 )}
 
                 <InfoRow label="Posted">
@@ -204,13 +201,23 @@ export default async function JobDetailPage({
         <div className="mt-16">
           <ApplicantsSection jobId={job.id} />
         </div>
+
+        {/* 🔥 COMPARE CANDIDATES (NEW FEATURE) */}
+        {/* <div className="mt-10">
+          <CompareCandidates
+            candidates={job.applications.map((a) => a.student)}
+            jobId={job.id}
+          />
+        </div> */}
       </div>
+
+      {/* CHATBOT */}
       <CompanyChat jobId={job.id} />
     </div>
   );
 }
 
-// Helper Components
+/* HELPERS */
 function Badge({ children, icon }: any) {
   return (
     <div className="flex items-center gap-2 px-3 py-1.5 text-xs rounded-full bg-white/[0.04] border border-white/10 text-zinc-300">
