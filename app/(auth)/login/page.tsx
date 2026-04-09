@@ -9,6 +9,8 @@ import { Navbar } from "@/components/navbar";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,6 +19,23 @@ export default function LoginPage() {
   const [password,setPassword]=useState("");
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+  if (status === "loading") return;
+
+  if (session?.user?.role === "STUDENT") {
+    router.replace("/student/dashboard");
+  }
+
+  if (session?.user?.role === "COMPANY") {
+    router.replace("/company/dashboard");
+  }
+
+  if (session && !session.user?.role) {
+    router.replace("/onboarding");
+  }
+}, [session, status, router]);
 
   const handleLogin=async(e:React.FormEvent)=>{
     e.preventDefault();

@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -12,6 +11,18 @@ datasource db {
 enum UserRole {
   STUDENT
   COMPANY
+}
+
+enum Status{
+  ACTIVE
+  COMPLETED
+}
+
+enum CompanySize {
+  SMALL      // 1-10
+  MEDIUM     // 10-50
+  LARGE      // 50-200
+  ENTERPRISE // 200+
 }
 
 enum ExperienceLevel {
@@ -42,7 +53,7 @@ model User {
 
   chatMessages ChatMessage[]
 
-  accounts Account[]
+  accounts Account[]  
   sessions Session[]
 }
 
@@ -82,7 +93,23 @@ model CompanyProfile {
 
   companyName String
   description String?
-  location    String?
+
+  location String?
+  website  String?
+
+  logoUrl   String?
+  bannerUrl String?
+
+  industry String?
+  companySize CompanySize?
+
+  foundedYear Int?
+
+  hiringDomains String[] @default([])
+
+  socialLinks Json?
+
+  profileCompleted Boolean @default(false)
 
   createdAt DateTime @default(now())
 
@@ -90,7 +117,6 @@ model CompanyProfile {
 
   @@index([userId])
 }
-
 model Job {
   id        String         @id @default(uuid())
   companyId String
@@ -99,12 +125,14 @@ model Job {
   title           String
   description     String?
   domainFocus     String?
+  status          Status? @default(ACTIVE)
 
   requiredSkills  String[]
-  preferredSkills String[]
+  // preferredSkills String[]
 
   minCgpa         Float?
   experienceLevel ExperienceLevel?
+  employmentType String? // "REMOTE" | "ONSITE" | "HYBRID"
 
   createdAt DateTime @default(now())
 

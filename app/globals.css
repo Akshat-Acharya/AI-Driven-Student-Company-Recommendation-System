@@ -104,3 +104,36 @@
     @apply bg-clip-text text-transparent bg-gradient-to-r from-[hsl(263,70%,60%)] to-[hsl(186,80%,50%)];
   }
 }
+
+.glass-toast {
+  background: rgba(20, 20, 25, 0.6) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+
+  color: #e4e4e7;
+  font-size: 14px;
+
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+/* SUCCESS */
+.glass-toast[data-sonner-toast][data-type="success"] {
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* ERROR */
+.glass-toast[data-sonner-toast][data-type="error"] {
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* WARNING */
+.glass-toast[data-sonner-toast][data-type="warning"] {
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+.glass-toast {
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(79, 70, 229, 0.15);
+}

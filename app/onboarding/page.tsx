@@ -1,5 +1,6 @@
 "use client";
 
+import { Navbar } from "@/components/navbar";
 import { motion } from "framer-motion";
 import { GraduationCap, Building2 } from "lucide-react";
 import { useState } from "react";
@@ -25,9 +26,12 @@ export default function OnboardingPage() {
     setLoading(false);
   };
 
-  return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100 flex items-center justify-center px-6">
 
+  return (
+    <div>
+      <Navbar/>
+<div className="min-h-screen bg-[#09090b] text-zinc-100 flex items-center justify-center px-6">
+    
       {/* glow background */}
 
       <div className="pointer-events-none absolute inset-0 flex justify-center opacity-60">
@@ -149,6 +153,7 @@ export default function OnboardingPage() {
 
       </motion.div>
 
+    </div>
     </div>
   );
 }
