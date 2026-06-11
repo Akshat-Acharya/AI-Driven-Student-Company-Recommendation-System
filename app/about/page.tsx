@@ -177,7 +177,6 @@ export default function AboutPage() {
 
               <TechStack title="AI Layer">
                 LangChain (JS) <br />
-                Ollama LLM (Mistral / LLaMA3) <br />
                 AI Skill Extraction
               </TechStack>
 

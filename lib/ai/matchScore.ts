@@ -1,7 +1,8 @@
-import { Ollama } from "@langchain/ollama";
+import { ChatGroq } from "@langchain/groq";
 
-const llm = new Ollama({
-  model: "llama3",
+const llm = new ChatGroq({
+  apiKey: process.env.GROQ_API_KEY,
+  model: "llama-3.3-70b-versatile",
 });
 
 /* 🔥 HELPER: SAFE JSON PARSE */
@@ -66,7 +67,7 @@ Return ONLY JSON.
   try {
     const response = await llm.invoke(prompt);
 
-    const parsed = safeParseJSON(response);
+    const parsed = safeParseJSON(response.content as string);
 
     if (!parsed) {
       return {

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { ChatOllama } from "@langchain/ollama";
+import { ChatGroq } from "@langchain/groq";
 
 export async function GET() {
   try {
@@ -132,7 +132,7 @@ export async function GET() {
 
     allApplications.forEach((app) => {
       app.student.skills?.forEach((skill: string) => {
-        const key = skill.toLowerCase(); // normalize
+        const key = skill.toLowerCase();
         skillMap[key] = (skillMap[key] || 0) + 1;
       });
     });
@@ -158,23 +158,24 @@ export async function GET() {
     /* =========================
        🚀 RESPONSE
     ========================== */
-     /* =========================
-    🤖 AI INSIGHTS (DYNAMIC)
- ========================== */
 
-let insights: string[] = [];
+    /* =========================
+       🤖 AI INSIGHTS (DYNAMIC)
+    ========================== */
 
-try {
-  const model = new ChatOllama({
-    baseUrl: "http://127.0.0.1:11434",
-    model: "llama3",
-  });
+    let insights: string[] = [];
 
-  const topSkillsText = skillData
-    .map((s) => `${s.skill} (${s.count})`)
-    .join(", ");
+    try {
+      const model = new ChatGroq({
+        apiKey: process.env.GROQ_API_KEY,
+        model: "llama-3.3-70b-versatile",
+      });
 
-  const prompt = `
+      const topSkillsText = skillData
+        .map((s) => `${s.skill} (${s.count})`)
+        .join(", ");
+
+      const prompt = `
 You are an AI hiring analyst.
 
 Based on the following hiring data, generate 3 short insights.
@@ -194,23 +195,24 @@ RULES:
 Return as plain text separated by new lines.
 `;
 
-  const response = await model.invoke(prompt);
+      const response = await model.invoke(prompt);
 
-  const raw = response.content as string;
+      const raw = response.content as string;
 
-  insights = raw
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .slice(0, 3);
+      insights = raw
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .slice(0, 3);
 
-} catch (err) {
-  console.error("AI INSIGHTS ERROR:", err);
+    } catch (err) {
+      console.error("AI INSIGHTS ERROR:", err);
 
-  insights = [
-    "Unable to generate insights",
-  ];
-}
+      insights = [
+        "Unable to generate insights",
+      ];
+    }
+
     return NextResponse.json({
       stats: {
         totalJobs,
