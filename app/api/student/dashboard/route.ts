@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { ChatOllama } from "@langchain/ollama";
+import { ChatGroq } from "@langchain/groq";
 
 export async function GET() {
   try {
@@ -80,9 +80,9 @@ export async function GET() {
     let insights: string[] = [];
 
     try {
-      const model = new ChatOllama({
-        baseUrl: "http://127.0.0.1:11434",
-        model: "llama3",
+      const model = new ChatGroq({
+        apiKey: process.env.GROQ_API_KEY,
+        model: "llama-3.3-70b-versatile",
       });
 
       const prompt = `

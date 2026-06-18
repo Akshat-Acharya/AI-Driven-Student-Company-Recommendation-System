@@ -1,10 +1,10 @@
-import { ChatOllama } from "@langchain/ollama";
+import { ChatGroq } from "@langchain/groq";
 
 export async function testModel() {
 
-  const model = new ChatOllama({
-    baseUrl: "http://localhost:11434",
-    model: "llama3",
+  const model = new ChatGroq({
+    apiKey: process.env.GROQ_API_KEY,
+    model: "llama-3.3-70b-versatile",
     temperature: 0,
   });
 
